@@ -1,6 +1,6 @@
 <?php
 
 spl_autoload_register(function ($class) {
-    require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR  
-        . '..' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR,  $class) . '.php';
+    require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR
+        . '..' . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $class) . '.php';
 });

@@ -1,4 +1,5 @@
 <?php
+
 namespace modules\ness\interfaces;
 
 use DateTime;
@@ -8,7 +9,8 @@ use DateTime;
  *
  * @author Aleksej Sokolov <aleksej000@gmail.com>,<chosenone111@protonmail.com>
  */
-interface Storage {
+interface Storage
+{
     public function readUsers(): array;
     public function readUser(string $username): array;
     public function findUser(string $shadowname): array;

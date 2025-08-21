@@ -5,7 +5,8 @@ namespace modules\ness;
 use modules\ness\Privateness;
 use modules\ness\lib\StorageJson;
 
-class Creator {
+class Creator
+{
     public static function Privateness(): Privateness
     {
         $json = new StorageJson();

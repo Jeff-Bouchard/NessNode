@@ -6,11 +6,9 @@ use Base32\Base32;
 use internals\lib\Output;
 use modules\ness\lib\ness as ness;
 use modules\ness\interfaces\Storage;
-
 use modules\emer\Emer;
 use modules\worm\Worm;
 use modules\ness\User;
-
 use modules\ness\exceptions\EUserDontExist;
 use modules\ness\exceptions\EMasterUserDontExist;
 use modules\ness\exceptions\EUserInsuficientFunds;
@@ -24,7 +22,6 @@ use modules\ness\exceptions\EMasterUserInsuficientFunds;
  */
 class Privateness
 {
-
     private array $config;
     private array $node_config;
     private array $users;
@@ -153,7 +150,7 @@ class Privateness
         $users = $this->users;
 
         foreach ($users as $username => $user) {
-            unset ($users[$username]['shadowname']);
+            unset($users[$username]['shadowname']);
 
             if (isset($this->payments[$username])) {
                 $users[$username]['payments'] = $this->payments[$username];
@@ -162,7 +159,6 @@ class Privateness
             }
 
             $users[$username]['active'] = $this->isActive($username);
-
         }
 
         return $users;
@@ -171,7 +167,7 @@ class Privateness
     /**
      * Generate users shadowname
      * Shadowname = MD5(Username-node.url-node.nonce-username-user.nonce)
-     * 
+     *
      * @param string $username
      * @return boolean
      */
@@ -189,7 +185,7 @@ class Privateness
     public function register(User $user)
     {
         $username = $user->getUsername();
-    
+
         if ($this->isMasterUser($username)) {
             if (empty($this->users[$username])) {
                 $ness = new ness();
@@ -219,8 +215,8 @@ class Privateness
                 return false;
             }
         }
-    } 
-    
+    }
+
     function registerUsername(string $username): bool
     {
         if (empty($this->users[$username])) {
@@ -361,7 +357,7 @@ class Privateness
         $ness = new ness();
         // Check coin ammount
         $balance = $this->balance($from_username);
-        if (($balance['coins'] < ($coins + 0.000001)) || ($balance['hours'] < ($hours+1))) {
+        if (($balance['coins'] < ($coins + 0.000001)) || ($balance['hours'] < ($hours + 1))) {
             throw new EUserInsuficientFunds($from_username, $balance['coins'], $balance['hours'], $coins, $hours);
         }
 
@@ -500,7 +496,7 @@ class Privateness
         }
 
         $balance = $this->balance($username);
-        
+
         return (($this->node_config['tariff'] * $this->users[$username]['counter'] + 1) <= $balance['hours']);
     }
 
@@ -717,7 +713,7 @@ class Privateness
         $emer = new Emer();
 
         $users = $this->listLocalUsers();
-        
+
         foreach ($users as $user_name => $local_user) {
             if ($user_name === $username) {
                 $user = $emer->findUser($username);
@@ -746,7 +742,7 @@ class Privateness
         $emer = new Emer();
 
         $users = $this->listLocalUsers();
-        
+
         foreach ($users as $username => $local_user) {
             if (isset($local_user['shadowname']) && ($shadowname === $local_user['shadowname'])) {
                 $user = $emer->findUser($username);
@@ -771,7 +767,7 @@ class Privateness
 
         foreach ($this->users as $username => $user) {
             if ($this->joined($username)) {
-                $slots_used ++;
+                $slots_used++;
             }
         }
 
@@ -793,8 +789,8 @@ class Privateness
         $users = $this->users;
 
         foreach ($users as $username => $user) {
-            $users[$username]['joined'] = $this->joined($username);   
-            $users[$username]['is_active'] = $this->isActive($username);   
+            $users[$username]['joined'] = $this->joined($username);
+            $users[$username]['is_active'] = $this->isActive($username);
         }
 
         return $users;

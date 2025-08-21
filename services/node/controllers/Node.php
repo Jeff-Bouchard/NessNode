@@ -49,7 +49,7 @@ class Node
     public function services()
     {
         $files = require __DIR__ . '/../../../config/files.php';
-        
+
         $services = [
             'prng' => [
                 'version' => '0.1 demo',
@@ -67,8 +67,8 @@ class Node
     {
         try {
             $pr = Creator::Privateness();
-            $user = $pr->findUser($username); 
-            
+            $user = $pr->findUser($username);
+
             if (false === $user) {
                 Output::error('User "' . $username . '" not found');
                 return false;
@@ -101,7 +101,7 @@ class Node
 
             // verify(user_public_key, “node.url-node.nonce-username-user.nonce”, authentication_id)
             $res = $pr->verifyUserId($id, $user);
-            
+
             if (true === $res) {
                 Output::message('User auth ID OK');
             } else {
@@ -219,7 +219,7 @@ class Node
 
                 $user = $pr->findUser($username);
                 $data = json_encode([
-                    'address' => $user->getAddress(), 
+                    'address' => $user->getAddress(),
                     'shadowname' => $user->getShadowname()
                 ]);
                 $sig = '';
@@ -257,7 +257,7 @@ class Node
                 if ($joined) {
                     $data = json_encode([
                             'joined' => true,
-                            'address' => $user->getAddress(), 
+                            'address' => $user->getAddress(),
                             'shadowname' => $user->getShadowname()
                     ]);
                 } else {
@@ -297,7 +297,7 @@ class Node
 
                 $data = json_encode(['balance' => $balance]);
                 $sig = '';
-    
+
                 $pr->encryptUser2way($data, $sig, $user);
                 Output::encrypted($data, $sig);
             } else {
@@ -341,7 +341,7 @@ class Node
 
                 $data = json_encode($data);
                 $sig = '';
-    
+
                 $pr->encryptUser2way($data, $sig, $user);
                 Output::encrypted($data, $sig);
             } else {

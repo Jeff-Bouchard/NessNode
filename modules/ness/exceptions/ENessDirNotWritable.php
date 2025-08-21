@@ -1,15 +1,13 @@
 <?php
+
 namespace modules\ness\exceptions;
 
-use \Throwable;
+use Throwable;
 
-class ENessDirNotWritable extends \Exception {
+class ENessDirNotWritable extends \Exception
+{
     public function __construct(int $code = 0, Throwable $previous = null)
     {
-        parent::__construct(
-            "Directory '~/.ness' not writable, check directory rights" , 
-            $code, 
-            $previous
-        );
+        parent::__construct("Directory '~/.ness' not writable, check directory rights", $code, $previous);
     }
 }

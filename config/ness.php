@@ -1,18 +1,17 @@
 <?php
-$hdf = __DIR__ . '/../homedir';
 
+$hdf = __DIR__ . '/../homedir';
 if (file_exists($hdf)) {
     $homedir = file_get_contents($hdf);
 } else {
     $homedir = posix_getpwuid(getmyuid())['dir'] . "/.ness";
 }
- 
+
 $filename_ness = $homedir . '/ness.json';
 $datadir = $homedir . '/data';
 $logdir = $homedir . '/log';
 $filename_users = $datadir . '/users.json';
 $filename_payments = $datadir . '/payments.json';
-
 if (!file_exists($filename_ness)) {
     throw new \Error("File '$homedir/ness.json' does not exist !");
 }
@@ -36,5 +35,4 @@ if (!is_writeable($logdir)) {
 $ness_config = json_decode(file_get_contents($filename_ness), true);
 $ness_config['users_addr_file'] = $filename_users;
 $ness_config['users_payments_file'] = $filename_payments;
-
 return $ness_config;

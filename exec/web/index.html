@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Actarus Network - PHP Console</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 0; background: #0b1020; color: #e6e9ef; }
+    header { padding: 16px 20px; background: #11172a; border-bottom: 1px solid #1f2740; position: sticky; top: 0; z-index: 1; }
+    h1 { margin: 0; font-size: 18px; letter-spacing: 0.3px; }
+    main { padding: 20px; display: grid; gap: 16px; max-width: 1100px; margin: 0 auto; }
+    .panel { background: #0f162b; border: 1px solid #1f2740; border-radius: 10px; overflow: hidden; }
+    .panel h2 { margin: 0; padding: 12px 14px; font-size: 14px; border-bottom: 1px solid #1f2740; background: #121a33; }
+    .content { padding: 14px; }
+    label { display: block; font-size: 12px; color: #96a0b5; margin-bottom: 6px; }
+    select, input[type="text"], textarea { width: 100%; box-sizing: border-box; background: #0b1327; border: 1px solid #243157; color: #e6e9ef; border-radius: 8px; padding: 10px 12px; font: inherit; }
+    textarea { min-height: 240px; resize: vertical; white-space: pre; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actions { display: flex; gap: 10px; align-items: center; }
+    button { background: #2e8bff; color: #fff; border: 0; border-radius: 8px; padding: 10px 14px; font: inherit; cursor: pointer; }
+    button.secondary { background: #1a233f; color: #c8d0e0; border: 1px solid #27345f; }
+    .pill { font-size: 12px; padding: 2px 8px; border-radius: 999px; border: 1px solid #27345f; background: #121a33; color: #aab3c7; }
+    .muted { color: #9aa6bf; font-size: 12px; }
+    .status { font-size: 12px; margin-left: auto; }
+    .success { color: #6ee7a8; }
+    .error { color: #ff6b6b; }
+    .hint { font-size: 12px; color: #9aa6bf; margin-top: 4px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    code { background: #0b1327; padding: 2px 6px; border-radius: 6px; border: 1px solid #243157; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Actarus Network • PHP Console</h1>
+  </header>
+  <main>
+    <section class="panel">
+      <h2>Runner</h2>
+      <div class="content">
+        <div class="grid-3">
+          <div>
+            <label for="script">Script</label>
+            <select id="script">
+              <option value="self-test.php">self-test.php</option>
+              <option value="make-config.php">make-config.php</option>
+              <option value="bulk_make_config.php">bulk_make_config.php</option>
+              <option value="create-user.php">create-user.php</option>
+              <option value="reg-master-user.php">reg-master-user.php</option>
+              <option value="payment-test.php">payment-test.php</option>
+              <option value="users.php">users.php</option>
+              <option value="test.php">test.php</option>
+            </select>
+            <div class="hint">Only whitelisted scripts from <code>nessnode/exec/</code> are available.</div>
+          </div>
+          <div>
+            <label for="args">Arguments</label>
+            <input id="args" type="text" placeholder="space-separated, e.g.: node.key.json wallet_id pass emc_user emc_pass slots quota" />
+            <div class="hint">Arguments are passed as CLI-like <code>$argv</code>.</div>
+          </div>
+          <div class="actions" style="align-self:end;">
+            <button id="run">Run</button>
+            <button id="clear" class="secondary">Clear</button>
+            <span id="status" class="status muted">Idle</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Output</h2>
+      <div class="content">
+        <textarea id="output" spellcheck="false" placeholder="> Output will appear here..."></textarea>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Tips</h2>
+      <div class="content">
+        <ul>
+          <li><span class="pill">Windows</span> If POSIX is unavailable, the runner provides safe stubs.</li>
+          <li>Scripts that rely on environment specifics may still require proper configuration files under <code>nessnode/homedir</code> or <code>~/.ness</code>.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+    const scriptSel = el('script');
+    const argsInput = el('args');
+    const output = el('output');
+    const status = el('status');
+
+    function setStatus(text, cls = 'muted') {
+      status.textContent = text;
+      status.className = 'status ' + cls;
+    }
+
+    el('clear').addEventListener('click', () => {
+      output.value = '';
+      setStatus('Idle');
+    });
+
+    el('run').addEventListener('click', async () => {
+      setStatus('Running...', 'pill');
+      const script = scriptSel.value;
+      const argsRaw = argsInput.value.trim();
+      // naive split respecting quoted strings
+      const args = argsRaw.match(/(?:\"[^\"]*\"|'[^']*'|\\.|[^\s"'])+/g) || [];
+
+      try {
+        const res = await fetch('run.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ script, args })
+        });
+        const data = await res.json();
+        const stamp = new Date().toLocaleString();
+        output.value += `\n[${stamp}] php ${script}${args.length ? ' ' + args.join(' ') : ''}\n`;
+        output.value += data.ok ? data.output : (data.error || 'Unknown error');
+        output.scrollTop = output.scrollHeight;
+        setStatus(data.ok ? 'Done' : 'Error', data.ok ? 'success' : 'error');
+      } catch (e) {
+        output.value += `\n[ERROR] ${e.message}\n`;
+        setStatus('Error', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

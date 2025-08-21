@@ -5,9 +5,8 @@ namespace Services\prng\controllers;
 use Exception;
 use modules\worm\Worm;
 use modules\ness\Privateness;
-use \modules\ness\lib\StorageJson;
+use modules\ness\lib\StorageJson;
 use modules\ness\Creator;
-
 use internals\lib\Output;
 use services\prng\exceptions\EFileNotFound;
 use services\prng\models\Prng as PrngModel;
@@ -15,7 +14,7 @@ use services\prng\models\Prng as PrngModel;
 /**
  *      !!! Warning !!!
  *      Change systemd configuration for apache
- *      in /lib/systemd/apache2.service 
+ *      in /lib/systemd/apache2.service
  *      or /usr/lib/systemd/system/httpd.service (Arch)
  *      the *** PrivateTmp=false ***
  */
@@ -35,7 +34,7 @@ class Prng
     {
         try {
             $user = $this->privateness->findUser($username);
-            
+
             if (false === $user) {
                 Output::error('User "' . $username . '" not found');
                 return false;
@@ -84,7 +83,7 @@ class Prng
             Output::error($exception->getMessage());
         }
     }
-    
+
     public function numbers(string $username, $id)
     {
         try {
@@ -138,7 +137,7 @@ class Prng
             Output::error($exception->getMessage());
         }
     }
-    
+
     public function i256(string $username, $id)
     {
         try {
@@ -165,7 +164,7 @@ class Prng
             Output::error($exception->getMessage());
         }
     }
-    
+
     public function h256(string $username, $id)
     {
         try {

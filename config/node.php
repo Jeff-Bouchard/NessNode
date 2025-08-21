@@ -1,6 +1,6 @@
 <?php
-$hdf = __DIR__ . '/../homedir';
 
+$hdf = __DIR__ . '/../homedir';
 if (file_exists($hdf)) {
     $homedir = file_get_contents($hdf);
 } else {
@@ -8,7 +8,6 @@ if (file_exists($hdf)) {
 }
 
 $filename = $homedir . '/node.json';
-
 if (!file_exists($filename)) {
     throw new \Error("File '$filename' does not exist !\nMake sure you have copied configuration from 'NessNodeTester/out/config' directory");
 }

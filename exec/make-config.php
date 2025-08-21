@@ -1,15 +1,12 @@
 <?php
+
 require 'utils/autoload.php';
 require 'utils/format.php';
-
 ini_set('display_errors', 'yes');
 error_reporting(E_ALL);
-
 $homedir = posix_getpwuid(getmyuid())['dir'];
-
 if ('/root' === $homedir) {
     $directory = '/home/ness';
-
     if (!file_exists($directory)) {
         mkdir($directory);
         chmod($directory, 0777);
@@ -19,7 +16,6 @@ if ('/root' === $homedir) {
 }
 
 file_put_contents(__DIR__ . '/../homedir', $directory);
-
 if ($argc == 8) {
     $node_json = $argv[1];
     $wallet_id = $argv[2];
@@ -28,7 +24,6 @@ if ($argc == 8) {
     $emc_password = $argv[5];
     $user_slots = $argv[6];
     $disk_usage_quota = $argv[7];
-
     if (!file_exists($node_json)) {
         formatPrintLn(['red', 'b'], "File $node_json does not exist");
         exit(1);
@@ -45,8 +40,7 @@ if ($argc == 8) {
     }
 
     $node_data = json_decode(file_get_contents($node_json), true);
-
-    // ness
+// ness
     $filename = $directory . '/ness.json';
     $data = [
         "host" => "localhost",
@@ -54,11 +48,9 @@ if ($argc == 8) {
         "port"  => 6422,
         "wallet_id"  => $wallet_id
     ];
-
     file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
     chmod($filename, 0644);
-
-    // emer
+// emer
     $filename = $directory . '/emer.json';
     $data = [
         "host" => "localhost",
@@ -66,11 +58,9 @@ if ($argc == 8) {
         "port" => 8332,
         "user" => $emc_password
     ];
-
     file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
     chmod($filename, 0644);
-
-    // node
+// node
     $filename = $directory . '/node.json';
     $data = [
         "services" => $node_data['services'],
@@ -86,28 +76,23 @@ if ($argc == 8) {
         "network" => $node_data['network'],
         "verify" => $node_data['keys']['verify']
     ];
-
     file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
     chmod($filename, 0644);
-
-    // files
+// files
     $filename = $directory . '/files.json';
     $data = [
         "dir" => "storage",
         "quota" => $disk_usage_quota,
         "salt" => base64_encode(random_bytes(32))
     ];
-
     file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
     chmod($filename, 0666);
-
     $storage_dir = __DIR__ . "/../services/files/storage";
-
     if (!file_exists($storage_dir)) {
         mkdir($storage_dir);
         chmod($filename, 0777);
     }
- 
+
     // prng
     $filename = $directory . '/prng.json';
     $data = [
@@ -118,12 +103,9 @@ if ($argc == 8) {
         "seed" => "/tmp/seed.txt",
         "seed-big" => "/tmp/seed-big.txt"
     ];
-
     file_put_contents($filename, json_encode($data, JSON_PRETTY_PRINT));
     chmod($filename, 0644);
-
     formatPrintLn(['green'], "Config files have been written to $directory");
-
 } else {
     formatPrintLn(['green', 'b'], 'Usage: ');
     formatPrintLn(['green'], 'php make-config.php node.key.json wallet_id password emc_user emc_password user_slots disk_usage_quota');

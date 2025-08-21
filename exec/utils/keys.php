@@ -1,6 +1,7 @@
 <?php
 
-class Keys {
+class Keys
+{
     public static string $directory = __DIR__ . '/../../in';
 
     public static function findNodeFile(): bool|array
@@ -14,7 +15,7 @@ class Keys {
                 continue;
             }
 
-            if ( self::checkNodeFile($data) ) {
+            if (self::checkNodeFile($data)) {
                 return $data;
             }
         }
@@ -33,7 +34,7 @@ class Keys {
                 continue;
             }
 
-            if ( self::checkUsersFile($data) ) {
+            if (self::checkUsersFile($data)) {
                 return $data;
             }
         }
@@ -52,7 +53,7 @@ class Keys {
                 continue;
             }
 
-            if ( self::checkGeneratedConfig($data) ) {
+            if (self::checkGeneratedConfig($data)) {
                 return $data;
             }
         }
@@ -75,7 +76,7 @@ class Keys {
 
     private static function checkNodeFile(array $data): bool
     {
-        return isset($data['filedata']) 
+        return isset($data['filedata'])
             && isset($data['filedata']['vendor']) && "Privateness" === $data['filedata']['vendor']
             && isset($data['filedata']['type']) && "key" === $data['filedata']['type']
             && isset($data['filedata']['for']) && "node" === $data['filedata']['for'];
@@ -83,7 +84,7 @@ class Keys {
 
     private static function checkUsersFile(array $data): bool
     {
-        return isset($data['filedata']) 
+        return isset($data['filedata'])
             && isset($data['filedata']['vendor']) && "Privateness" === $data['filedata']['vendor']
             && isset($data['filedata']['type']) && "key" === $data['filedata']['type']
             && isset($data['filedata']['for']) && "user" === $data['filedata']['for'];

@@ -1,35 +1,32 @@
 <?php
+
 namespace modules\worm;
 
-class Worm {
-
-    public static function isUser(string $xml): bool 
+class Worm
+{
+    public static function isUser(string $xml): bool
     {
         $xml = preg_replace("/<!--.+?-->/i", '', $xml);
         $xml = preg_replace('/”/i', '"', $xml);
         $xmlObject = simplexml_load_string($xml);
-
-        if (false === $xmlObject || NULL === $xmlObject->user) {
+        if (false === $xmlObject || null === $xmlObject->user) {
             return false;
         }
 
         return true;
     }
 
-    public static function parseUser(string $xml): array 
+    public static function parseUser(string $xml): array
     {
         $xml = preg_replace("/<!--.+?-->/i", '', $xml);
         $xml = preg_replace('/”/i', '"', $xml);
         $xmlObject = simplexml_load_string($xml);
-
         $type = (string) $xmlObject->user['type'];
         $nonce = (string) $xmlObject->user['nonce'];
         $tags = (string) $xmlObject->user['tags'];
         $public_key = (string) $xmlObject->user['public'];
         $verify_key = (string) $xmlObject->user['verify'];
-
         $tags = explode(',', $tags);
-
         return [
             'type' => $type,
             'nonce' => $nonce,
@@ -39,13 +36,12 @@ class Worm {
         ];
     }
 
-    public static function isNode(string $xml): bool 
+    public static function isNode(string $xml): bool
     {
         $xml = preg_replace("/<!--.+?-->/i", '', $xml);
         $xml = preg_replace('/”/i', '"', $xml);
         $xmlObject = simplexml_load_string($xml);
-
-        if (false === $xmlObject || NULL === $xmlObject->node) {
+        if (false === $xmlObject || null === $xmlObject->node) {
             return false;
         }
 
@@ -53,48 +49,45 @@ class Worm {
             return false;
         }
 
-        if (empty( $xmlObject->node['url'])) {
+        if (empty($xmlObject->node['url'])) {
             return false;
         }
 
-        if (empty( $xmlObject->node['nonce'])) {
+        if (empty($xmlObject->node['nonce'])) {
             return false;
         }
 
-        if (empty( $xmlObject->node['public'])) {
+        if (empty($xmlObject->node['public'])) {
             return false;
         }
 
-        if (empty( $xmlObject->node['verify'])) {
+        if (empty($xmlObject->node['verify'])) {
             return false;
         }
 
-        if (empty( $xmlObject->node['services'])) {
+        if (empty($xmlObject->node['services'])) {
             return false;
         }
 
-        if (empty( $xmlObject->node['tariff'])) {
+        if (empty($xmlObject->node['tariff'])) {
             return false;
         }
 
-        if (empty( $xmlObject->node['master-user'])) {
+        if (empty($xmlObject->node['master-user'])) {
             return false;
         }
 
         return true;
     }
 
-    public static function parseNode(string $xml): array 
+    public static function parseNode(string $xml): array
     {
         $xml = preg_replace("/<!--.+?-->/i", '', $xml);
         $xml = preg_replace('/”/i', '"', $xml);
         $xmlObject = simplexml_load_string($xml);
-
         $network = "inet";
-
         $type = (string) $xmlObject->node['type'];
         $url = (string) $xmlObject->node['url'];
-
         if (!empty($xmlObject->node['network'])) {
             $network = (string) $xmlObject->node['network'];
         }
@@ -105,9 +98,7 @@ class Worm {
         $verify = (string) $xmlObject->node['verify'];
         $master = (string) $xmlObject->node['master-user'];
         $tariff = (float) $xmlObject->node['tariff'];
-
         $services = explode(',', $services);
-
         return [
             'type' => $type,
             'url' => $url,

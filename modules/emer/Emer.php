@@ -10,7 +10,6 @@ use modules\emer\exceptions\ENodeNotFound;
 
 class Emer
 {
-
     private $config;
 
     /**

@@ -1,4 +1,13 @@
 <?php
+
+/**
+ * Front controller for the Ness node web interface.
+ *
+ * Bootstraps the launcher and routes HTTP requests to services.
+ *
+ * @package NessNode\Web
+ */
+
 if (file_exists(__DIR__ . '/../debug')) {
     ini_set('display_errors', 'yes');
     error_reporting(E_ALL);
@@ -23,4 +32,4 @@ try {
     ob_clean();
     header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
     echo 'Service "' . $e->service . '" not found !';
-} 
+}

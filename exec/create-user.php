@@ -1,22 +1,18 @@
 <?php
+
 require 'utils/autoload.php';
 require 'utils/format.php';
-
-use \modules\ness\Privateness;
-use \modules\ness\lib\StorageJson;
-
+use modules\ness\Privateness;
+use modules\ness\lib\StorageJson;
 ini_set('display_errors', 'yes');
 error_reporting(E_ALL);
-
 $json = new StorageJson();
 $pr = new Privateness($json);
-
 if ($argc >= 2) {
     $username = $argv[1];
-
     if (!$pr->userExists($username)) {
         formatPrintLn(['green'], '......');
-        if ($pr->registerUsername($username) ) {
+        if ($pr->registerUsername($username)) {
             formatPrint(['green'], 'User ');
             formatPrint(['b', 'green'], $username);
             formatPrintLn(['green'], ' created OK');

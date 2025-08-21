@@ -1,7 +1,9 @@
 <?php
+
 namespace modules\emer\lib;
+
 /*
-					COPYRIGHT
+                    COPYRIGHT
 
 Copyright 2007 Sergio Vaccaro <sergio@inservibile.org>
 Modified by Neo
@@ -30,159 +32,155 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  * @author sergio <jsonrpcphp@inservibile.org>
  * modified by Neo
  */
-class JsonRpcClient {
-  
-  public static $error;
-  public static $output;
+class JsonRpcClient
+{
+    public static $error;
+    public static $output;
+/**
+     * Debug state
+     *
+     * @var boolean
+     */
+    public static $debug = false;
 
-	/**
-	 * Debug state
-	 *
-	 * @var boolean
-	 */
-	public static $debug = false;
-	
-	/**
-	 * The server URL
-	 *
-	 * @var string
-	 */
-	private $url;
-	/**
-	 * The request id
-	 *
-	 * @var integer
-	 */
-	private $id;
-	/**
-	 * If true, notifications are performed instead of requests
-	 *
-	 * @var boolean
-	 */
-	private $notification = false;
-	
-	/**
-	 * Takes the connection parameters
-	 *
-	 * @param string $url
-	 * @param boolean $debug
-	 */
-	public function __construct($url) {
-		// server URL
-		$this->url = $url;
-		// message id
-		$this->id = rand(1, 99999);
-	}
-	
-	/**
-	 * Sets the notification state of the object. In this state, notifications are performed, instead of requests.
-	 *
-	 * @param boolean $notification
-	 */
-	public function setRPCNotification($notification) {
-		empty($notification) ?
-							$this->notification = false
-							:
-							$this->notification = true;
-	}
-	
-	/**
-	 * Performs a jsonRCP request and gets the results as an array
-	 *
-	 * @param string $method
-	 * @param array $params
-	 * @return array
-	 */
-	public function __call($method,$params) {
-		
-		// check
-		if (!is_scalar($method)) {
-			throw new \Exception('Method name has no scalar value');
-		}
-		
-		// check
-		if (is_array($params)) {
-			// no keys
-			$params = array_values($params);
-		} else {
-			throw new \Exception('Params must be given as array');
-		}
-		
-		// sets notification or request task
-		if ($this->notification) {
-			$currentId = NULL;
-		} else {
-			$currentId = $this->id;
-		}
-		
-		// prepares the request
-		$request = array(
+    /**
+     * The server URL
+     *
+     * @var string
+     */
+    private $url;
+/**
+     * The request id
+     *
+     * @var integer
+     */
+    private $id;
+/**
+     * If true, notifications are performed instead of requests
+     *
+     * @var boolean
+     */
+    private $notification = false;
+
+    /**
+     * Takes the connection parameters
+     *
+     * @param string $url
+     * @param boolean $debug
+     */
+    public function __construct($url)
+    {
+        // server URL
+        $this->url = $url;
+// message id
+        $this->id = rand(1, 99999);
+    }
+
+    /**
+     * Sets the notification state of the object. In this state, notifications are performed, instead of requests.
+     *
+     * @param boolean $notification
+     */
+    public function setRPCNotification($notification)
+    {
+        empty($notification) ?
+                            $this->notification = false
+                            :
+                            $this->notification = true;
+    }
+
+    /**
+     * Performs a jsonRCP request and gets the results as an array
+     *
+     * @param string $method
+     * @param array $params
+     * @return array
+     */
+    public function __call($method, $params)
+    {
+
+        // check
+        if (!is_scalar($method)) {
+            throw new \Exception('Method name has no scalar value');
+        }
+
+        // check
+        if (is_array($params)) {
+// no keys
+            $params = array_values($params);
+        } else {
+            throw new \Exception('Params must be given as array');
+        }
+
+        // sets notification or request task
+        if ($this->notification) {
+            $currentId = null;
+        } else {
+            $currentId = $this->id;
+        }
+
+        // prepares the request
+        $request = array(
                     'jsonrpc' => '1.0',
                     'method' => $method,
                     'params' => $params,
                     'id' => $currentId
                 );
-
-		self::$output = [];
-                
-		// debug output
-		self::$output[] = '';
-		self::$output[] = '***** Request *****';
-		self::$output[] = print_r($request, true);
-		self::$output[] = '***** End Of request *****';
-                
-		$request = json_encode($request, JSON_UNESCAPED_UNICODE );
-                
-		// performs the HTTP POST
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $this->url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('content-type: application/json;charset=\"utf-8\"'));
-		curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
-    $responce = curl_exec($ch);
-
-    if(!is_string($responce)) {
-      throw new \Exception("Can't connect to: ".$this->url.' '.curl_error ( $ch ));
-    }
-    else {
+        self::$output = [];
+// debug output
         self::$output[] = '';
-        self::$output[] = '***** Responce *****';
-        self::$output[] = $responce;
-        self::$output[] = '***** End Of responce *****';
-    }
-    
-		$responce = json_decode($responce,true);
-		curl_close($ch);
-		
-		// final checks and return
-		if (!$this->notification) {
-			// check
-			if ($responce['id'] != $currentId) {
-				if (self::$debug) {
-					print_r($this->url);
-					print_r(self::$output);
-				}
-
-				throw new \Exception('Incorrect response id (request id: '.$currentId.', response id: '.$responce['id'].')');
-			}
-			if (!is_null($responce['error'])) {
-				if (self::$debug) {
-					print_r($this->url);
-					print_r(self::$output);
-				}
-
-				throw new \Exception('Request error: '.$responce['error']['message']);
-			}
-			
-			return $responce['result'];
-			
-		} else {
-			return true;
-		}
-	}
-        
-        public static function printOutout() {
-            echo implode('<br/>', self::$output);
+        self::$output[] = '***** Request *****';
+        self::$output[] = print_r($request, true);
+        self::$output[] = '***** End Of request *****';
+        $request = json_encode($request, JSON_UNESCAPED_UNICODE);
+// performs the HTTP POST
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $this->url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('content-type: application/json;charset=\"utf-8\"'));
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
+        $responce = curl_exec($ch);
+        if (!is_string($responce)) {
+            throw new \Exception("Can't connect to: " . $this->url . ' ' . curl_error($ch));
+        } else {
+            self::$output[] = '';
+            self::$output[] = '***** Responce *****';
+            self::$output[] = $responce;
+            self::$output[] = '***** End Of responce *****';
         }
+
+        $responce = json_decode($responce, true);
+        curl_close($ch);
+
+        // final checks and return
+        if (!$this->notification) {
+// check
+            if ($responce['id'] != $currentId) {
+                if (self::$debug) {
+                    print_r($this->url);
+                    print_r(self::$output);
+                }
+
+                throw new \Exception('Incorrect response id (request id: ' . $currentId . ', response id: ' . $responce['id'] . ')');
+            }
+            if (!is_null($responce['error'])) {
+                if (self::$debug) {
+                    print_r($this->url);
+                    print_r(self::$output);
+                }
+
+                throw new \Exception('Request error: ' . $responce['error']['message']);
+            }
+
+            return $responce['result'];
+        } else {
+            return true;
+        }
+    }
+
+    public static function printOutout()
+    {
+        echo implode('<br/>', self::$output);
+    }
 }
